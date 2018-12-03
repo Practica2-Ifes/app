@@ -26,6 +26,9 @@ export default class Home extends React.Component {
   }
   componentDidMount() {
     this.validarUsuario().then(this.traerFichas);
+    this._subscribe = this.props.navigation.addListener('didFocus', () => {
+      this.traerFichas();
+    });
   }
 
   nuevaFicha() {
@@ -33,7 +36,7 @@ export default class Home extends React.Component {
   }
 
   traerFichas() {
-    API.getFichas(this.state.user.credentials)
+    return API.getFichas(this.state.user.credentials)
       .then(fichas => {
         this.setState({ fichas });
       })
@@ -42,18 +45,25 @@ export default class Home extends React.Component {
 
   validarUsuario() {
     const { navigation } = this.props;
-    return API.getUser()
-      .then(user => {
-        if(user) {
-          this.setState({ user });
-        } else {
+    const user = navigation.getParam('user', null);
+    if(!user) {
+      return API.getUser()
+        .then(user => {
+          if(user) {
+            this.setState({ user });
+          } else {
+            navigation.navigate('Login');
+          }
+        })
+        .catch(e => {
+          console.warn(e);
           navigation.navigate('Login');
-        }
-      })
-      .catch(e => {
-        console.warn(e);
-        navigation.navigate('Login');
+        });
+    } else {
+      return new Promise((resolve, reject) => {
+        return this.setState({ user }, resolve);
       });
+    }
   }
 
   render() {

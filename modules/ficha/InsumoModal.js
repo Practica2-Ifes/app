@@ -1,6 +1,14 @@
 import React from 'react';
-import { Modal, Text, TouchableHighlight, View, Alert, ScrollView, StyleSheet } from 'react-native';
-import SelectMultiple from 'react-native-select-multiple';
+import {
+  Modal,
+  Text,
+  TextInput,
+  TouchableHighlight,
+  View,
+  Alert,
+  Picker,
+  StyleSheet
+} from 'react-native';
 import Colors from '../../constants/Colors';
 
 class InsumoModal extends React.Component {
@@ -8,7 +16,9 @@ class InsumoModal extends React.Component {
   state = {
     modalVisible: false,
     insumos: [],
-    selectedItems: []
+    selectedInsumo: {},
+    selectedId: '1',
+    cantidadUsada: '1'
   };
 
   setModalVisible(visible) {
@@ -16,27 +26,30 @@ class InsumoModal extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ insumos: nextProps.insumos });
+    const { insumos  } = nextProps;
+    const selectedInsumo = insumos.length > 0 ? insumos[0] : {};
+    const selectedId = selectedInsumo ? selectedInsumo.$$instanceId : 0;
+    this.setState({ insumos, selectedInsumo, selectedId });
   }
 
-  onSelectionsChange = (selectedItems) => {
-    this.setState({ selectedItems });
-  }
-
-  formatInsumos(insumos) {
-    return insumos.map(i => {
-      return { label: i.$$title, value: i };
-    });
+  onValueChange = selectedId => {
+    const selectedInsumo = this.state.insumos.find(i => i.$$instanceId === selectedId) || {};
+    this.setState({ selectedId, selectedInsumo });
   }
 
   renderInsumos() {
-    const { insumos } = this.state;
-    const formattedInsumos = this.formatInsumos(insumos);
+    const { insumos, selectedId } = this.state;
     return <View>
-      <SelectMultiple
-        items={formattedInsumos}
-        selectedItems={this.state.selectedItems}
-        onSelectionsChange={this.onSelectionsChange} />
+      <Picker
+        selectedValue={selectedId}
+        mode="dropdown"
+        enabled={true}
+        onValueChange={this.onValueChange}
+      >
+        {insumos.map(
+          i => <Picker.Item key={i.$$instanceId} label={i.$$title} value={i.$$instanceId}/>
+        )}
+      </Picker>
     </View>;
   }
 
@@ -50,22 +63,32 @@ class InsumoModal extends React.Component {
           onRequestClose={() => {
             Alert.alert('Modal has been closed.');
           }}>
-          <View style={styles.container}>
-            <View>
-              <Text style={styles.text}>Insumos</Text>
-              <ScrollView contentContainerStyle={styles.container} style={this.props.style}>
-                {this.renderInsumos()}
-              </ScrollView>
-              <TouchableHighlight
-                onPress={() => {
-                  this.setModalVisible(!this.state.modalVisible)
-                  this.props.refresh(this.state.selectedItems)
-                }}
-                style={styles.buttonStyle}
-              >
-                <Text style={styles.text}>Aceptar</Text>
-              </TouchableHighlight>
-            </View>
+          <View>
+            <Text style={styles.title}>Insumos:</Text>
+            {this.renderInsumos()}
+            <Text style={styles.title}>Cantidad Usada:</Text>
+            <TextInput
+              keyboardType="numeric"
+              style={styles.numericInput}
+              value={this.state.cantidadUsada}
+              onChangeText={cantidadUsada => this.setState({ cantidadUsada })}
+            />
+            <TouchableHighlight
+              onPress={() => {
+                this.setModalVisible(!this.state.modalVisible)
+                this.props.refresh(this.state.selectedInsumo, this.state.cantidadUsada)
+              }}
+              style={styles.buttonStyle}
+            >
+              <Text style={styles.text}>Aceptar</Text>
+            </TouchableHighlight>
+            <TouchableHighlight
+              onPress={() => this.setModalVisible(false)}
+              style={styles.closeButton}
+              disabled={this.state.insumos.length <= 0}
+            >
+              <Text style={styles.closeText}>Cancelar</Text>
+            </TouchableHighlight>
           </View>
         </Modal>
 
@@ -86,11 +109,37 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 15
   },
+  title: {
+    fontSize: 20,
+    marginTop: 40,
+    textAlign: 'center'
+  },
+  numericInput: {
+    minWidth: '50%',
+    width: 'auto',
+    alignSelf: 'center',
+    textAlign: 'center',
+    fontSize: 20
+  },
+  closeButton: {
+    position: 'absolute',
+    left: 0,
+    top: 40,
+    borderStyle: 'solid',
+    borderColor: Colors.text,
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 5
+  },
   container: {
     margin: 20,
     alignItems: 'center',
   },
+  closetext: {
+    fontSize: 10
+  },
   buttonStyle: {
+    width: '90%',
     margin: 20,
     borderRadius: 5,
     padding: 10,

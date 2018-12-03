@@ -1,5 +1,12 @@
 import React from 'react';
-import { StyleSheet, ScrollView, View, Text, TextInput, TouchableOpacity } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity
+} from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { ButtonGroup } from 'react-native-elements';
 import DatePicker from 'react-native-datepicker';
 import API from '../API';
@@ -7,6 +14,7 @@ import TecnicoModal from './TecnicoModal';
 import InsumoModal from './InsumoModal';
 import UnidadModal from './UnidadModal';
 import Colors from '../../constants/Colors';
+const TIPOS_DE_FICHA = ['C1', 'C2', 'C3'];
 
 export default class Ficha extends React.Component {
   static navigationOptions = {
@@ -24,9 +32,10 @@ export default class Ficha extends React.Component {
       insumos: [],
       insumosSeleccionados: [],
       selectedType: 0,
-      fecha: new Date().toISOString(),
-      fechaControl: new Date().toISOString(),
-      anotaciones: ''
+      fecha: new Date().toISOString().split('T')[0],
+      fechaControl: new Date().toISOString().split('T')[0],
+      anotaciones: '',
+      submitDisabled: false
     };
     this.traerTecnicos = this.traerTecnicos.bind(this);
     this.renderTecnicosSeleccionados = this.renderTecnicosSeleccionados.bind(this);
@@ -36,16 +45,64 @@ export default class Ficha extends React.Component {
     this.renderUnidadesSeleccionadas = this.renderUnidadesSeleccionadas.bind(this);
     this.refreshUnidadesSeleccionadas = this.refreshUnidadesSeleccionadas.bind(this);
     this.updateIndex = this.updateIndex.bind(this);
+    this.guardarTecnicos = this.guardarTecnicos.bind(this);
   }
 
   componentDidMount() {
     const { navigation } = this.props;
     const user = navigation.getParam('user');
-    this.setState({ user }, async () => {
+    const traerData = async () => {
       await this.traerTecnicos();
       await this.traerInsumos();
       await this.traerUnidades();
+    };
+    this._subscribe = this.props.navigation.addListener('didFocus', () => {
+      traerData();
     });
+    this.setState({ user }, traerData);
+  }
+
+  submitData = () => {
+    const {
+      fecha,
+      fechaControl,
+      user,
+      selectedType,
+      observaciones
+    } = this.state;
+    const tipoDeFicha = TIPOS_DE_FICHA[selectedType];
+    this.setState({ submitDisabled: true });
+    API.guardarFicha(user.credentials, fecha, tipoDeFicha, observaciones)
+      .then(ficha => {
+        return Promise.all([
+          this.guardarTecnicos(ficha),
+          this.guardarInsumos(ficha),
+          this.guardarUnidades(ficha),
+          this.props.navigation.navigate('Home'),
+          this.setState({ submitDisabled: false })
+        ]);
+      });
+  }
+
+  guardarTecnicos(ficha) {
+    const { user, tecnicosSeleccionados } = this.state;
+    Promise.all(tecnicosSeleccionados.map(t => {
+      API.agregarTecnico(user.credentials, ficha.$$instanceId, t.tecnicoSeleccionado, t.horasTrabajo);
+    }));
+  }
+
+  guardarInsumos(ficha) {
+    const { user, insumosSeleccionados } = this.state;
+    Promise.all(insumosSeleccionados.map(i => {
+      API.agregarInsumo(user.credentials, ficha.$$instanceId, i.insumoSeleccionado, i.cantidadUsada);
+    }));
+  }
+
+  guardarUnidades(ficha) {
+    const { user, unidadesSeleccionadas } = this.state;
+    Promise.all(unidadesSeleccionadas.map(i => {
+      API.agregarInsumo(user.credentials, ficha.$$instanceId, i.unidadSeleccionada, i.horas, i.estadoUnidad);
+    }));
   }
  
   updateIndex (selectedType) {
@@ -70,15 +127,27 @@ export default class Ficha extends React.Component {
       .catch(console.warn);
   }
 
-  refreshTecnicosSeleccionados(tecnicosSeleccionados) {
+  refreshTecnicosSeleccionados(tecnicoSeleccionado, horasTrabajo) {
+    const tecnicosSeleccionados = [
+      ...this.state.tecnicosSeleccionados,
+      { tecnicoSeleccionado, horasTrabajo }
+    ];
     this.setState({ tecnicosSeleccionados });
   }
 
-  refreshInsumosSeleccionados(insumosSeleccionados) {
+  refreshInsumosSeleccionados(insumoSeleccionado, cantidadUsada) {
+    const insumosSeleccionados = [
+      ...this.state.insumosSeleccionados,
+      { insumoSeleccionado, cantidadUsada }
+    ];
     this.setState({ insumosSeleccionados });
   }
-
-  refreshUnidadesSeleccionadas(unidadesSeleccionadas) {
+  
+  refreshUnidadesSeleccionadas(unidadSeleccionada, horas, estadoUnidad) {
+    const unidadesSeleccionadas = [
+      ...this.state.unidadesSeleccionadas,
+      { unidadSeleccionada, estadoUnidad }
+    ];
     this.setState({ unidadesSeleccionadas });
   }
 
@@ -90,7 +159,7 @@ export default class Ficha extends React.Component {
     } else {
       return tecnicos.map((item, index) => {
         return <Text key={index} style={styles.text}>
-          {item.label}
+          {`${item.tecnicoSeleccionado.$$title}, ${item.horasTrabajo} horas`}
         </Text>
       });
     }
@@ -104,7 +173,7 @@ export default class Ficha extends React.Component {
     } else {
       return insumos.map((item, index) => {
         return <Text key={index} style={styles.text}>
-          {item.label}
+          {`${item.insumoSeleccionado.$$title}, x${item.cantidadUsada}`}
         </Text>
       });
     }
@@ -118,7 +187,7 @@ export default class Ficha extends React.Component {
     } else {
       return insumos.map((item, index) => {
         return <Text key={index} style={styles.text}>
-          {item.label}
+          {`${item.unidadSeleccionada.$$title}, ${item.estadoUnidad ? 'on': 'off'} ${item.horas} horas`}
         </Text>
       });
     }
@@ -131,13 +200,16 @@ export default class Ficha extends React.Component {
       unidadesSeleccionadas,
       selectedType
     } = this.state;
-    const tiposDeFicha = ['C1', 'C2', 'C3'];
     return <View style={{ backgroundColor: Colors.background }}>
-      <ScrollView containerStyle={styles.container}>
+      <KeyboardAwareScrollView
+        containerStyle={styles.container}
+        enableOnAndroid
+        extraScrollHeight={80}
+      >
         <ButtonGroup
           onPress={this.updateIndex}
           selectedIndex={selectedType}
-          buttons={tiposDeFicha}
+          buttons={TIPOS_DE_FICHA}
           containerStyle={styles.subContainer}
           selectedButtonStyle={styles.selectedButtonStyle}
         />
@@ -205,21 +277,22 @@ export default class Ficha extends React.Component {
         </View>
         <View style={styles.subContainerPadded}>
           <Text style={styles.title}>
-            Anotaciones:
+            Observaciones:
           </Text>
           <TextInput
             style={styles.textInput}
             multiline={true}
-            value={this.state.anotaciones}
-            onChangeText={anotaciones => this.setState({ anotaciones })}
+            value={this.state.observaciones}
+            onChangeText={observaciones => this.setState({ observaciones })}
           />
         </View>
         <View style={styles.bottomFix} />
-      </ScrollView>
+      </KeyboardAwareScrollView>
       <View style={styles.fixedButton}>
         <TouchableOpacity
           onPress={this.submitData}
           style={styles.buttonStyle}
+          disabled={this.state.disabled}
         >
           <Text style={styles.buttonText}>
             Crear

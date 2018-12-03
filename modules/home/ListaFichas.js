@@ -15,10 +15,10 @@ class ListaFichas extends React.Component {
     this.setState({ fichas: nextProps.fichas });
   }
   renderFichas() {
-    return this.state.fichas.map((item, index) => {
+    return this.state.fichas.reverse().map((item, index) => {
       return <View style={this.props.fichaStyle} key={index}>
         <Text style={this.props.textStyle}>
-          {item.$$title}:
+          {item.$$title}
         </Text>
       </View>
     });

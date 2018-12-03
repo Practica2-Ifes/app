@@ -1,13 +1,12 @@
 import React from 'react';
 import {
-  Image,
+  KeyboardAvoidingView,
   Platform,
-  Button,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  ScrollView,
   View,
 } from 'react-native';
 import Colors from '../../constants/Colors';
@@ -30,7 +29,7 @@ export default class Login extends React.Component {
   iniciarSesion() {
     const { navigate } = this.props.navigation;
     API.login(this.state.usernameText, this.state.passwordText)
-      .then(user => navigate('Home'))
+      .then(user => navigate('Home', { user }))
       .catch(loginError => {
         this.setState({
           loginErrorMessage:  loginError.message
@@ -53,7 +52,7 @@ export default class Login extends React.Component {
             <Text style={styles.nombreText}>Mantenimiento Predictivo</Text>
           </View>
 
-          <View style={styles.loginForm}>
+          <KeyboardAvoidingView behavior="padding" style={styles.loginForm}>
             {
               this.state.loginErrorMessage
                 ? <Text style={styles.errorDialogue}>
@@ -87,7 +86,7 @@ export default class Login extends React.Component {
                 Iniciar Sesión
               </Text>
             </TouchableOpacity>
-          </View>
+          </KeyboardAvoidingView>
 
         </ScrollView>
 

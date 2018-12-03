@@ -6,15 +6,22 @@ import Login from '../modules/login/Login';
 import Home from '../modules/home/Home';
 import Ficha from '../modules/ficha/Ficha';
 
+const navigationOptions = () => ({
+  headerBackTitle: 'Atras',
+  headerTruncatedBackTitle: 'Atras'
+});
 const Navigator = createStackNavigator({
   Home: {
-    screen: Home
+    screen: Home,
+    navigationOptions
   },
   Login: {
-    screen: Login
+    screen: Login,
+    navigationOptions
   },
   Ficha: {
-    screen: Ficha
+    screen: Ficha,
+    navigationOptions
   }
 });
 

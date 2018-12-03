@@ -9,13 +9,16 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "base-64": "^0.1.0",
     "expo": "^31.0.2",
     "react": "16.5.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-31.0.0.tar.gz",
     "react-native-datepicker": "^1.7.2",
     "react-native-elements": "^0.19.1",
+    "react-native-keyboard-aware-scroll-view": "^0.7.4",
     "react-native-select-multiple": "^1.2.0",
+    "react-native-switch": "^1.5.0",
     "react-navigation": "^3.0.4"
   },
   "devDependencies": {
