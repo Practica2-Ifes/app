@@ -33,8 +33,7 @@ export default class Ficha extends React.Component {
       insumosSeleccionados: [],
       selectedType: 0,
       fecha: new Date().toISOString().split('T')[0],
-      fechaControl: new Date().toISOString().split('T')[0],
-      anotaciones: '',
+      observaciones: '',
       submitDisabled: false
     };
     this.traerTecnicos = this.traerTecnicos.bind(this);
@@ -65,7 +64,6 @@ export default class Ficha extends React.Component {
   submitData = () => {
     const {
       fecha,
-      fechaControl,
       user,
       selectedType,
       observaciones
@@ -86,23 +84,29 @@ export default class Ficha extends React.Component {
 
   guardarTecnicos(ficha) {
     const { user, tecnicosSeleccionados } = this.state;
-    Promise.all(tecnicosSeleccionados.map(t => {
-      API.agregarTecnico(user.credentials, ficha.$$instanceId, t.tecnicoSeleccionado, t.horasTrabajo);
-    }));
+    if(tecnicosSeleccionados.length > 0) {
+      Promise.all(tecnicosSeleccionados.map(t => {
+        API.agregarTecnico(user.credentials, ficha.$$instanceId, t.tecnicoSeleccionado, t.horasTrabajo);
+      }));
+    }
   }
 
   guardarInsumos(ficha) {
     const { user, insumosSeleccionados } = this.state;
-    Promise.all(insumosSeleccionados.map(i => {
-      API.agregarInsumo(user.credentials, ficha.$$instanceId, i.insumoSeleccionado, i.cantidadUsada);
-    }));
+    if(insumosSeleccionados.length > 0) {
+      Promise.all(insumosSeleccionados.map(i => {
+        API.agregarInsumo(user.credentials, ficha.$$instanceId, i.insumoSeleccionado, i.cantidadUsada);
+      }));
+    }
   }
 
   guardarUnidades(ficha) {
     const { user, unidadesSeleccionadas } = this.state;
-    Promise.all(unidadesSeleccionadas.map(i => {
-      API.agregarInsumo(user.credentials, ficha.$$instanceId, i.unidadSeleccionada, i.horas, i.estadoUnidad);
-    }));
+    if(unidadesSeleccionadas.length > 0) {
+      Promise.all(unidadesSeleccionadas.map(i => {
+        API.agregarUnidad(user.credentials, ficha.$$instanceId, i.unidadSeleccionada, i.horas, i.estadoUnidad);
+      }));
+    }
   }
  
   updateIndex (selectedType) {
@@ -146,7 +150,7 @@ export default class Ficha extends React.Component {
   refreshUnidadesSeleccionadas(unidadSeleccionada, horas, estadoUnidad) {
     const unidadesSeleccionadas = [
       ...this.state.unidadesSeleccionadas,
-      { unidadSeleccionada, estadoUnidad }
+      { unidadSeleccionada, estadoUnidad, horas }
     ];
     this.setState({ unidadesSeleccionadas });
   }
@@ -187,7 +191,7 @@ export default class Ficha extends React.Component {
     } else {
       return insumos.map((item, index) => {
         return <Text key={index} style={styles.text}>
-          {`${item.unidadSeleccionada.$$title}, ${item.estadoUnidad ? 'on': 'off'} ${item.horas} horas`}
+          {item.unidadSeleccionada.$$title}
         </Text>
       });
     }
@@ -227,22 +231,6 @@ export default class Ficha extends React.Component {
             cancelBtnText="Cancelar"
             showIcon={false}
             onDateChange={fecha => this.setState({ fecha })}
-          />
-        </View>
-        <View style={styles.subContainerPadded}>
-          <Text style={styles.title}>
-            Fecha a realizar control:
-          </Text>
-          <DatePicker
-            style={styles.date}
-            date={this.state.fechaControl}
-            mode="date"
-            placeholder="Seleccionar"
-            format="YYYY-MM-DD"
-            confirmBtnText="Confirmar"
-            cancelBtnText="Cancelar"
-            showIcon={false}
-            onDateChange={fechaControl => this.setState({ fechaControl })}
           />
         </View>
         <View style={styles.subContainerPadded}>

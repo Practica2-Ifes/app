@@ -67,7 +67,7 @@ class InsumoModal extends React.Component {
             <Text style={styles.title}>Insumos:</Text>
             {this.renderInsumos()}
             <Text style={styles.title}>Cantidad Usada:</Text>
-            <TextInput
+            <Text2Input
               keyboardType="numeric"
               style={styles.numericInput}
               value={this.state.cantidadUsada}

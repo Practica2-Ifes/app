@@ -9,9 +9,16 @@ import {
   Picker,
   StyleSheet
 } from 'react-native';
-import { Switch } from 'react-native-switch';
+import { ButtonGroup } from 'react-native-elements';
 import Colors from '../../constants/Colors';
 
+const ESTADOS_UNIDAD = ['Encendido', 'Apagado', 'Posible_Falla', 'Reparacion'];
+
+const BUTTONS = ESTADOS_UNIDAD.map(e => {
+  return {
+    element: () => <Text style={styles.buttonText}>{e}</Text>
+  };
+});
 
 class UnidadModal extends React.Component {
   
@@ -21,7 +28,7 @@ class UnidadModal extends React.Component {
     selectedUnidad: {},
     selectedId: '1',
     horas: '0',
-    estadoUnidad: true
+    selectedIndex: 0
   };
   
   setModalVisible(visible) {
@@ -69,6 +76,14 @@ class UnidadModal extends React.Component {
           <View>
             <Text style={styles.title}>Unidad de Mantenimiento:</Text>
             {this.renderUnidades()}
+            <Text style={styles.title}>Estado:</Text>
+            <ButtonGroup
+              onPress={selectedIndex => this.setState({ selectedIndex })}
+              selectedIndex={this.state.selectedIndex}
+              buttons={BUTTONS}
+              containerStyle={styles.subContainer}
+              selectedButtonStyle={styles.selectedButton}
+            />
             <Text style={styles.title}>Horas:</Text>
             <TextInput
               keyboardType="numeric"
@@ -76,24 +91,10 @@ class UnidadModal extends React.Component {
               value={this.state.horas}
               onChangeText={horas => this.setState({ horas })}
             />
-            <Text style={{...styles.title, left: -40}}>Unidad Encendida</Text>
-            <View style={styles.switch}>
-              <Switch
-                value={this.state.estadoUnidad}
-                onValueChange={estadoUnidad => this.setState({ estadoUnidad })}
-                disabled={false}
-                activeText="ON"
-                inActiveText="OFF"
-                backgroundActive={Colors.background}
-                backgroundInactive={Colors.secondaryBackground}
-                circleActiveColor={Colors.noticeBackground}
-                circleInActiveColor={Colors.secondaryBackground}
-              />
-            </View>
             <TouchableHighlight
               onPress={() => {
                 this.setModalVisible(!this.state.modalVisible)
-                this.props.refresh(this.state.selectedUnidad, this.state.horas, this.estadoUnidad)
+                this.props.refresh(this.state.selectedUnidad, this.state.horas, ESTADOS_UNIDAD[this.state.selectedIndex])
               }}
               style={styles.buttonStyle}
               disabled={this.state.unidades.length <= 0}
@@ -122,6 +123,15 @@ class UnidadModal extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  subContainer: {
+    backgroundColor: Colors.secondaryBackground,
+    marginTop: 20,
+    width: '80%',
+    alignSelf: 'center'
+  },
+  selectedButton: {
+    backgroundColor: Colors.noticeBackground
+  },
   text: {
     textAlign: 'center',
     fontSize: 15
@@ -147,6 +157,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     padding: 5
+  },
+  buttonText: {
+    fontSize: 10
   },
   container: {
     margin: 20,

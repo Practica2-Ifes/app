@@ -149,8 +149,15 @@ const styles = StyleSheet.create({
   nombreText: {
     fontSize: 17,
     color: Colors.text,
-    fontSize: 40,
     textAlign: 'center',
+    ...Platform.select({
+      ios: {
+        fontSize: 40,
+      },
+      android: {
+        fontSize: 20,
+      },
+    })
   }
 });
 

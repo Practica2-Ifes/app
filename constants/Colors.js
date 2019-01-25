@@ -1,8 +1,8 @@
-const tintColor = 'rgb(152, 205, 181)';
+const tintColor = 'tomato';
 const warningColor = 'rgb(252, 202, 100)';
 const errorColor = 'rgb(253, 112, 108)';
 const white = '#fff';
-const lightGray = '#eee';
+const lightGray = '#fee';
 const text = '#161616';
 
 export default {

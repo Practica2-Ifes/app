@@ -61,7 +61,8 @@ export default {
   },
     
   guardarFicha(credentials, fechaDeCreacion, tipoDeFicha, observaciones) {
-    const queryString = `?fechaDeCreacion=${fechaDeCreacion}&&tipoDeFicha=${tipoDeFicha}&&observaciones=${observaciones}`;
+    const observacionesQuery = `&&observaciones=${observaciones ? observaciones : 'Sin observaciones'}`;
+    const queryString = `?fechaDeCreacion=${fechaDeCreacion}&&tipoDeFicha=${tipoDeFicha}` + observacionesQuery;
     return this.basicGet('/services/simple.FichaMenu/actions/crear/invoke' + queryString, credentials)
       .then(res => {
         if(res.status !== 200) {
@@ -70,7 +71,8 @@ export default {
           return res;
         }
       })
-      .then(res => res.data);
+      .then(res => res.data)
+      .catch(e => console.warn(e.response));
   },
 
   objectToMeta(item) {
@@ -98,13 +100,14 @@ export default {
 
   agregarInsumo(credentials, id, insumo, cantidadUsada) {
     const body = {
-      insumoUsado: {
+      insumo: {
         value: this.objectToMeta(insumo)
       },
       cantidadUsada: {
         value: parseInt(cantidadUsada)
       }
     };
+    console.log(body)
     const uri = `/objects/mantenimiento.Ficha/${id}/actions/agregarInsumo/invoke`;
     return this.basicPut(uri, credentials, body).catch(e => console.log(e.response));
   },
@@ -122,6 +125,7 @@ export default {
       }
     };
     const uri = `/objects/mantenimiento.Ficha/${id}/actions/agregarUnidad/invoke`;
+    console.log(body)
     return this.basicPut(uri, credentials, body).catch(e => console.log(e.response));
   },
 
