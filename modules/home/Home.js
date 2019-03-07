@@ -9,21 +9,16 @@ export default class Home extends React.Component {
     headerLeft: null
   };
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      fichas: [],
-      user: {
-        nombre: '',
-        apellido: '',
-        tipoTecnico: '',
-        credentials: ''
-      }
-    };
-    this.nuevaFicha = this.nuevaFicha.bind(this);
-    this.validarUsuario = this.validarUsuario.bind(this);
-    this.traerFichas = this.traerFichas.bind(this);
-  }
+  state = {
+    fichas: [],
+    user: {
+      nombre: '',
+      apellido: '',
+      tipoTecnico: '',
+      credentials: ''
+    }
+  };
+
   componentDidMount() {
     this.validarUsuario().then(this.traerFichas);
     this._subscribe = this.props.navigation.addListener('didFocus', () => {
@@ -31,11 +26,11 @@ export default class Home extends React.Component {
     });
   }
 
-  nuevaFicha() {
+  nuevaFicha = () => {
     this.props.navigation.navigate('Ficha', { user: this.state.user });
   }
 
-  traerFichas() {
+  traerFichas = () => {
     return API.getFichas(this.state.user.credentials)
       .then(fichas => {
         this.setState({ fichas });
@@ -43,7 +38,7 @@ export default class Home extends React.Component {
       .catch(console.warn);
   }
 
-  validarUsuario() {
+  validarUsuario = () => {
     const { navigation } = this.props;
     const user = navigation.getParam('user', null);
     if(!user) {

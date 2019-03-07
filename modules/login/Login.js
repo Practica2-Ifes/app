@@ -13,18 +13,16 @@ import Colors from '../../constants/Colors';
 import API from '../API';
 
 export default class Login extends React.Component {
+
   static navigationOptions = {
     header: null,
   };
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      loginErrorMessage: '',
-      usernameText: '',
-      passwordText: ''
-    };
-  }
+  state = {
+    loginErrorMessage: '',
+    usernameText: '',
+    passwordText: ''
+  };
 
   iniciarSesion() {
     const { navigate } = this.props.navigation;
@@ -32,7 +30,7 @@ export default class Login extends React.Component {
       .then(user => navigate('Home', { user }))
       .catch(loginError => {
         this.setState({
-          loginErrorMessage:  loginError.message
+          loginErrorMessage: loginError.message
         })
         setTimeout(() => {
           this.setState({
@@ -48,7 +46,6 @@ export default class Login extends React.Component {
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
 
           <View style={styles.nombreContainer}>
-
             <Text style={styles.nombreText}>Mantenimiento Predictivo</Text>
           </View>
 

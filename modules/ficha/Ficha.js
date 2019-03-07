@@ -16,36 +16,24 @@ import UnidadModal from './UnidadModal';
 import Colors from '../../constants/Colors';
 const TIPOS_DE_FICHA = ['C1', 'C2', 'C3'];
 
+
 export default class Ficha extends React.Component {
   static navigationOptions = {
-    title: 'Nueva Ficha',
+    title: 'Ficha',
   };
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      user: {},
-      tecnicos: [],
-      tecnicosSeleccionados: [],
-      unidades: [],
-      unidadesSeleccionadas: [],
-      insumos: [],
-      insumosSeleccionados: [],
-      selectedType: 0,
-      fecha: new Date().toISOString().split('T')[0],
-      observaciones: '',
-      submitDisabled: false
-    };
-    this.traerTecnicos = this.traerTecnicos.bind(this);
-    this.renderTecnicosSeleccionados = this.renderTecnicosSeleccionados.bind(this);
-    this.refreshTecnicosSeleccionados = this.refreshTecnicosSeleccionados.bind(this);
-    this.renderInsumosSeleccionados = this.renderInsumosSeleccionados.bind(this);
-    this.refreshInsumosSeleccionados = this.refreshInsumosSeleccionados.bind(this);
-    this.renderUnidadesSeleccionadas = this.renderUnidadesSeleccionadas.bind(this);
-    this.refreshUnidadesSeleccionadas = this.refreshUnidadesSeleccionadas.bind(this);
-    this.updateIndex = this.updateIndex.bind(this);
-    this.guardarTecnicos = this.guardarTecnicos.bind(this);
-  }
+  state = {
+    user: {},
+    tecnicos: [],
+    tecnicosSeleccionados: [],
+    unidades: [],
+    unidadesSeleccionadas: [],
+    insumos: [],
+    insumosSeleccionados: [],
+    selectedType: 0,
+    fecha: new Date().toISOString().split('T')[0],
+    observaciones: '',
+    submitDisabled: false
+  };
 
   componentDidMount() {
     const { navigation } = this.props;
@@ -82,7 +70,7 @@ export default class Ficha extends React.Component {
       });
   }
 
-  guardarTecnicos(ficha) {
+  guardarTecnicos = ficha => {
     const { user, tecnicosSeleccionados } = this.state;
     if(tecnicosSeleccionados.length > 0) {
       Promise.all(tecnicosSeleccionados.map(t => {
@@ -91,7 +79,7 @@ export default class Ficha extends React.Component {
     }
   }
 
-  guardarInsumos(ficha) {
+  guardarInsumos = ficha => {
     const { user, insumosSeleccionados } = this.state;
     if(insumosSeleccionados.length > 0) {
       Promise.all(insumosSeleccionados.map(i => {
@@ -100,7 +88,7 @@ export default class Ficha extends React.Component {
     }
   }
 
-  guardarUnidades(ficha) {
+  guardarUnidades = ficha => {
     const { user, unidadesSeleccionadas } = this.state;
     if(unidadesSeleccionadas.length > 0) {
       Promise.all(unidadesSeleccionadas.map(i => {
@@ -109,29 +97,29 @@ export default class Ficha extends React.Component {
     }
   }
  
-  updateIndex (selectedType) {
+  updateIndex = selectedType => {
     this.setState({ selectedType });
   }
   
-  traerTecnicos() {
+  traerTecnicos = () => {
     return API.getTecnicos(this.state.user.credentials)
       .then(tecnicos => this.setState({ tecnicos }))
       .catch(console.warn);
   }
 
-  traerInsumos() {
+  traerInsumos = () => {
     return API.getInsumos(this.state.user.credentials)
       .then(insumos => this.setState({ insumos }))
       .catch(console.warn);
   }
 
-  traerUnidades() {
+  traerUnidades = () => {
     return API.getUnidades(this.state.user.credentials)
       .then(unidades => this.setState({ unidades }))
       .catch(console.warn);
   }
 
-  refreshTecnicosSeleccionados(tecnicoSeleccionado, horasTrabajo) {
+  refreshTecnicosSeleccionados = (tecnicoSeleccionado, horasTrabajo) => {
     const tecnicosSeleccionados = [
       ...this.state.tecnicosSeleccionados,
       { tecnicoSeleccionado, horasTrabajo }
@@ -139,7 +127,7 @@ export default class Ficha extends React.Component {
     this.setState({ tecnicosSeleccionados });
   }
 
-  refreshInsumosSeleccionados(insumoSeleccionado, cantidadUsada) {
+  refreshInsumosSeleccionados = (insumoSeleccionado, cantidadUsada) => {
     const insumosSeleccionados = [
       ...this.state.insumosSeleccionados,
       { insumoSeleccionado, cantidadUsada }
@@ -147,7 +135,7 @@ export default class Ficha extends React.Component {
     this.setState({ insumosSeleccionados });
   }
   
-  refreshUnidadesSeleccionadas(unidadSeleccionada, horas, estadoUnidad) {
+  refreshUnidadesSeleccionadas = (unidadSeleccionada, horas, estadoUnidad) => {
     const unidadesSeleccionadas = [
       ...this.state.unidadesSeleccionadas,
       { unidadSeleccionada, estadoUnidad, horas }
@@ -155,7 +143,7 @@ export default class Ficha extends React.Component {
     this.setState({ unidadesSeleccionadas });
   }
 
-  renderTecnicosSeleccionados(tecnicos) {
+  renderTecnicosSeleccionados = tecnicos => {
     if(tecnicos.length <= 0) {
       return <Text style={styles.text}>
         Ningun tecnico seleccionado
@@ -169,7 +157,7 @@ export default class Ficha extends React.Component {
     }
   }
 
-  renderInsumosSeleccionados(insumos) {
+  renderInsumosSeleccionados = insumos => {
     if(insumos.length <= 0) {
       return <Text style={styles.text}>
         Ningun insumo seleccionado
@@ -183,7 +171,7 @@ export default class Ficha extends React.Component {
     }
   }
 
-  renderUnidadesSeleccionadas(insumos) {
+  renderUnidadesSeleccionadas = insumos => {
     if(insumos.length <= 0) {
       return <Text style={styles.text}>
         Ninguna Unidad de Mantenimiento seleccionada
@@ -298,7 +286,7 @@ const subContainer = {
   alignSelf: 'center'
 };
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   bottomFix: {
     height: 60
   },

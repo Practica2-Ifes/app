@@ -21,7 +21,7 @@ class InsumoModal extends React.Component {
     cantidadUsada: '1'
   };
 
-  setModalVisible(visible) {
+  setModalVisible = visible => {
     this.setState({ modalVisible: visible });
   }
 
@@ -67,7 +67,7 @@ class InsumoModal extends React.Component {
             <Text style={styles.title}>Insumos:</Text>
             {this.renderInsumos()}
             <Text style={styles.title}>Cantidad Usada:</Text>
-            <Text2Input
+            <TextInput
               keyboardType="numeric"
               style={styles.numericInput}
               value={this.state.cantidadUsada}
@@ -85,7 +85,6 @@ class InsumoModal extends React.Component {
             <TouchableHighlight
               onPress={() => this.setModalVisible(false)}
               style={styles.closeButton}
-              disabled={this.state.insumos.length <= 0}
             >
               <Text style={styles.closeText}>Cancelar</Text>
             </TouchableHighlight>

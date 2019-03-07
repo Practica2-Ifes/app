@@ -2,19 +2,15 @@ import React from 'react';
 import { Text, View, ScrollView, StyleSheet } from 'react-native';
 
 class ListaFichas extends React.Component {
-  
-  constructor(props) {
-    super(props);
-    this.state = {
-      fichas: []
-    };
-    this.renderFichas = this.renderFichas.bind(this);
-  }
+  state = {
+    fichas: []
+  };
 
   componentWillReceiveProps(nextProps) {
     this.setState({ fichas: nextProps.fichas });
   }
-  renderFichas() {
+
+  renderFichas = () => {
     return this.state.fichas.reverse().map((item, index) => {
       return <View style={this.props.fichaStyle} key={index}>
         <Text style={this.props.textStyle}>

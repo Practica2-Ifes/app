@@ -1,3 +1,3 @@
 export default {
-  apiUrl: 'https://mantenimiento-predictivo.herokuapp.com/restful'
+  apiUrl: 'http://localhost:8080/restful'
 };

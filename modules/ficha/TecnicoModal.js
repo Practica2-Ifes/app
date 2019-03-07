@@ -21,11 +21,6 @@ class TecnicoModal extends React.Component {
     horasTrabajo: '0'
   };
 
-  constructor(props) {
-    super(props);
-    this.onValueChange = this.onValueChange.bind(this);
-  }
-
   setModalVisible(visible) {
     this.setState({modalVisible: visible});
   }
@@ -37,7 +32,7 @@ class TecnicoModal extends React.Component {
     this.setState({ tecnicos, selectedTecnico, selectedId });
   }
 
-  onValueChange(selectedId) {
+  onValueChange = selectedId => {
     const selectedTecnico = this.state.tecnicos.find(i => i.$$instanceId === selectedId) || {};
     this.setState({ selectedTecnico, selectedId });
   }
