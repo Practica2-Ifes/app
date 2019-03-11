@@ -1,5 +1,11 @@
 import React from 'react';
-import { Text, View, ScrollView, StyleSheet } from 'react-native';
+import {
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet
+} from 'react-native';
+import Colors from '../../constants/Colors';
 
 class ListaFichas extends React.Component {
   state = {
@@ -10,13 +16,18 @@ class ListaFichas extends React.Component {
     this.setState({ fichas: nextProps.fichas });
   }
 
+  redirect = ficha => {
+    this.props.navigation.navigate('FichaReview', { ficha });
+  }
+
   renderFichas = () => {
+    const sortedFichas = this.state.fichas.sort((a, b) => a.$$title - b.$$title);
     return this.state.fichas.reverse().map((item, index) => {
-      return <View style={this.props.fichaStyle} key={index}>
-        <Text style={this.props.textStyle}>
+      return <TouchableOpacity style={styles.ficha} key={index} onPress={() => this.redirect(item)}>
+        <Text style={styles.text}>
           {item.$$title}
         </Text>
-      </View>
+      </TouchableOpacity>
     });
   }
   
@@ -32,8 +43,15 @@ class ListaFichas extends React.Component {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    width: '90%',
     margin: 20,
+  },
+  text: {
+    fontSize: 25,
+    backgroundColor: Colors.background,
+    padding: 10,
+    borderRadius: 10
+  },
+  ficha: {
   }
 });
 

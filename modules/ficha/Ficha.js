@@ -14,6 +14,11 @@ import TecnicoModal from './TecnicoModal';
 import InsumoModal from './InsumoModal';
 import UnidadModal from './UnidadModal';
 import Colors from '../../constants/Colors';
+import {
+  InsumosSeleccionados,
+  UnidadesSeleccionadas,
+  TecnicosSeleccionados
+} from './ItemsSeleccionados'
 const TIPOS_DE_FICHA = ['C1', 'C2', 'C3'];
 
 
@@ -143,48 +148,6 @@ export default class Ficha extends React.Component {
     this.setState({ unidadesSeleccionadas });
   }
 
-  renderTecnicosSeleccionados = tecnicos => {
-    if(tecnicos.length <= 0) {
-      return <Text style={styles.text}>
-        Ningun tecnico seleccionado
-      </Text>;
-    } else {
-      return tecnicos.map((item, index) => {
-        return <Text key={index} style={styles.text}>
-          {`${item.tecnicoSeleccionado.$$title}, ${item.horasTrabajo} horas`}
-        </Text>
-      });
-    }
-  }
-
-  renderInsumosSeleccionados = insumos => {
-    if(insumos.length <= 0) {
-      return <Text style={styles.text}>
-        Ningun insumo seleccionado
-      </Text>;
-    } else {
-      return insumos.map((item, index) => {
-        return <Text key={index} style={styles.text}>
-          {`${item.insumoSeleccionado.$$title}, x${item.cantidadUsada}`}
-        </Text>
-      });
-    }
-  }
-
-  renderUnidadesSeleccionadas = insumos => {
-    if(insumos.length <= 0) {
-      return <Text style={styles.text}>
-        Ninguna Unidad de Mantenimiento seleccionada
-      </Text>;
-    } else {
-      return insumos.map((item, index) => {
-        return <Text key={index} style={styles.text}>
-          {item.unidadSeleccionada.$$title}
-        </Text>
-      });
-    }
-  }
-
   render() {
     const {
       tecnicosSeleccionados,
@@ -225,7 +188,7 @@ export default class Ficha extends React.Component {
           <Text style={styles.title}>
             Tecnicos:
           </Text>
-          { this.renderTecnicosSeleccionados(tecnicosSeleccionados) }
+          <TecnicosSeleccionados tecnicos={tecnicosSeleccionados} />
           <TecnicoModal
             tecnicos={this.state.tecnicos}
             refresh={this.refreshTecnicosSeleccionados} 
@@ -235,7 +198,7 @@ export default class Ficha extends React.Component {
           <Text style={styles.title}>
             Insumos:
           </Text>
-          { this.renderInsumosSeleccionados(insumosSeleccionados) }
+          <InsumosSeleccionados insumos={insumosSeleccionados} />
           <InsumoModal
             insumos={this.state.insumos}
             refresh={this.refreshInsumosSeleccionados} 
@@ -245,7 +208,7 @@ export default class Ficha extends React.Component {
           <Text style={styles.title}>
             Unidades de Mantenimiento:
           </Text>
-          { this.renderUnidadesSeleccionadas(unidadesSeleccionadas) }
+          <UnidadesSeleccionadas unidades={unidadesSeleccionadas} />
           <UnidadModal
             unidades={this.state.unidades}
             refresh={this.refreshUnidadesSeleccionadas} 

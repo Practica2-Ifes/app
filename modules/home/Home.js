@@ -1,13 +1,20 @@
 import React from 'react';
-import { View, TouchableOpacity, ScrollView, StyleSheet, Text } from 'react-native';
+import { Button, TouchableOpacity, ScrollView, StyleSheet, Text } from 'react-native';
 import Colors from '../../constants/Colors';
 import API from '../API';
 import ListaFichas from './ListaFichas';
 
 export default class Home extends React.Component {
-  static navigationOptions = {
-    headerLeft: null
-  };
+  static navigationOptions = ({ navigation }) => ({
+    headerLeft: null,
+    headerRight: (
+      <Button
+        onPress={() => navigation.navigate('Opciones')}
+        title="Opciones"
+        color={Colors.text}
+      />
+    )
+  });
 
   state = {
     fichas: [],
@@ -20,9 +27,8 @@ export default class Home extends React.Component {
   };
 
   componentDidMount() {
-    this.validarUsuario().then(this.traerFichas);
     this._subscribe = this.props.navigation.addListener('didFocus', () => {
-      this.traerFichas();
+      this.validarUsuario().then(this.traerFichas);
     });
   }
 
@@ -35,7 +41,7 @@ export default class Home extends React.Component {
       .then(fichas => {
         this.setState({ fichas });
       })
-      .catch(console.warn);
+      .catch(e => console.log(e.request));
   }
 
   validarUsuario = () => {
@@ -75,9 +81,8 @@ export default class Home extends React.Component {
         <ListaFichas
           fichas={this.state.fichas}
           style={styles.listaFichas}
-          textStyle={styles.fichaText}
           secondaryTextStyle={styles.fichaSecondaryText}
-          fichaStyle={styles.ficha}
+          navigation={this.props.navigation}
         />
       </ScrollView>
     );
@@ -85,14 +90,8 @@ export default class Home extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  fichaText: {
-    fontSize: 20,
-  },
   fichaSecondaryText: {
     fontSize: 15,
-  },
-  ficha: {
-    margin: 10
   },
   mainContainer: {
     alignItems: 'center',

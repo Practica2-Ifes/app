@@ -3,11 +3,23 @@ import config from '../config';
 import base64 from 'base-64';
 import axios from 'axios';
 
-export default {
+export class API {
+
+  set apiUrl(url) {
+    this._apiUrl = url;
+  }
+
+  get apiUrl() {
+    return this._apiUrl;
+  }
+
+  constructor() {
+    this._apiUrl = config.apiUrl;
+  }
   
   basicGet(uri, credentials, options) {
-    const url = config.apiUrl + uri;
-    return axios({
+    const url = this._apiUrl + uri;
+    const reqOptions = Object.assign({
       url,
       method: 'get',
       headers: {
@@ -17,11 +29,12 @@ export default {
         'pragma': 'no-cache',
         'cache-control': 'no-cache'
       }
-    });
-  },
+    }, options)
+    return axios(reqOptions);
+  }
 
   basicPut(uri, credentials, data) {
-    const url = config.apiUrl + uri;
+    const url = this._apiUrl + uri;
     return axios({
       url,
       method: 'put',
@@ -34,7 +47,7 @@ export default {
         'cache-control': 'no-cache'
       }
     });
-  },
+  }
   
   getUser() {
     return AsyncStorage.getItem('@Store:user')
@@ -46,7 +59,31 @@ export default {
           });
       })
       .catch(console.warn);
-  },
+  }
+
+  formatResult({ data }) {
+    if(data.length > 0) {
+      return data;
+    } else {
+      return [];
+    }
+  }
+
+  insumosFicha(ficha, credentials) {
+    return this.basicGet(`/objects/mantenimiento.Ficha/${ficha.$$instanceId}/collections/insumos`, credentials)
+      .then(this.formatResult);
+  }
+
+  tecnicosFicha(ficha, credentials) {
+    return this.basicGet(`/objects/mantenimiento.Ficha/${ficha.$$instanceId}/collections/tecnicos`, credentials)
+      .then(this.formatResult);
+  }
+
+  unidadesFicha(ficha, credentials) {
+    return this.basicGet(`/objects/mantenimiento.Ficha/${ficha.$$instanceId}/collections/unidades`, credentials)
+      .then(this.formatResult);
+  }
+
 
   getFichas(credentials) {
     return this.basicGet('/services/simple.FichaMenu/actions/listar/invoke', credentials)
@@ -58,7 +95,7 @@ export default {
         }
       })
       .then(res => res.data);
-  },
+  }
     
   guardarFicha(credentials, fechaDeCreacion, tipoDeFicha, observaciones) {
     const observacionesQuery = `&&observaciones=${observaciones ? observaciones : 'Sin observaciones'}`;
@@ -73,7 +110,7 @@ export default {
       })
       .then(res => res.data)
       .catch(e => console.warn(e.response));
-  },
+  }
 
   objectToMeta(item) {
     return {
@@ -83,7 +120,7 @@ export default {
       type: 'application/json;profile=\"urn:org.restfulobjects:repr-types/object\"',
       title: item.$$title
     };
-  },
+  }
 
   agregarTecnico(credentials, id, tecnico, horasTrabajo) {
     const body = {
@@ -96,7 +133,7 @@ export default {
     };
     const uri = `/objects/mantenimiento.Ficha/${id}/actions/agregarTecnico/invoke`;
     return this.basicPut(uri, credentials, body).catch(e => console.log(e.response));
-  },
+  }
 
   agregarInsumo(credentials, id, insumo, cantidadUsada) {
     const body = {
@@ -110,7 +147,7 @@ export default {
     console.log(body)
     const uri = `/objects/mantenimiento.Ficha/${id}/actions/agregarInsumo/invoke`;
     return this.basicPut(uri, credentials, body).catch(e => console.log(e.response));
-  },
+  }
 
   agregarUnidad(credentials, id, unidad, horas, estadoUnidad) {
     const body = {
@@ -127,7 +164,7 @@ export default {
     const uri = `/objects/mantenimiento.Ficha/${id}/actions/agregarUnidad/invoke`;
     console.log(body)
     return this.basicPut(uri, credentials, body).catch(e => console.log(e.response));
-  },
+  }
 
 
   getTecnicos(credentials) {
@@ -140,7 +177,7 @@ export default {
         }
       })
       .then(res => res.data);
-  },
+  }
 
   getInsumos(credentials) {
     return this.basicGet('/services/simple.Insumo/actions/listar/invoke', credentials)
@@ -152,7 +189,7 @@ export default {
         }
       })
       .then(res => res.data);
-  },
+  }
 
   getUnidades(credentials) {
     return this.basicGet('/services/simple.UnidadMenu/actions/listar/invoke', credentials)
@@ -164,7 +201,7 @@ export default {
         }
       })
       .then(res => res.data);
-  },
+  }
   
   login(username, password) {
     const credentials = base64.encode(username + ':' + password);
@@ -189,3 +226,5 @@ export default {
   }
   
 }
+
+export default new API(config);
