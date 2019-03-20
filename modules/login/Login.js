@@ -24,6 +24,10 @@ export default class Login extends React.Component {
     passwordText: ''
   };
 
+  opciones = () => {
+    this.props.navigation.navigate('Opciones');
+  }
+
   iniciarSesion = () => {
     const { navigate } = this.props.navigation;
     API.login(this.state.usernameText, this.state.passwordText)
@@ -83,6 +87,7 @@ export default class Login extends React.Component {
                 Iniciar Sesión
               </Text>
             </TouchableOpacity>
+            <Text style={styles.text} onPress={this.opciones}>Opciones</Text>
           </KeyboardAvoidingView>
 
         </ScrollView>
@@ -142,6 +147,11 @@ const styles = StyleSheet.create({
     width: '90%',
     height: 50,
     fontSize: 20
+  },
+  text: {
+    textAlign: 'center',
+    fontSize: 20,
+    margin: 20
   },
   nombreText: {
     fontSize: 17,
