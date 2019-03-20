@@ -24,7 +24,7 @@ export default class Login extends React.Component {
     passwordText: ''
   };
 
-  iniciarSesion() {
+  iniciarSesion = () => {
     const { navigate } = this.props.navigation;
     API.login(this.state.usernameText, this.state.passwordText)
       .then(user => navigate('Home', { user }))
@@ -36,7 +36,7 @@ export default class Login extends React.Component {
           this.setState({
             loginErrorMessage: ''
           });
-        }, 5000);
+        }, 3000);
       });
   }
 
@@ -76,7 +76,7 @@ export default class Login extends React.Component {
               onChangeText={passwordText => this.setState({ passwordText })}
             />
             <TouchableOpacity
-              onPress={this.iniciarSesion.bind(this)}
+              onPress={this.iniciarSesion}
               style={styles.loginButtonContainer}
             >
               <Text style={styles.loginButton}>
